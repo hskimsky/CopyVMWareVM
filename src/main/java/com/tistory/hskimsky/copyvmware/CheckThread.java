@@ -8,21 +8,24 @@ import java.io.File;
  * @author Haneul Kim
  * @version 0.1
  */
-public class CheckThread extends Thread {
+public class CheckThread implements Runnable {
 
     private long sourceSize;
 
     private File target;
 
+    private String targetVMName;
+
     public CheckThread(long sourceSize, File target) {
         this.sourceSize = sourceSize;
         this.target = target;
+
+        this.targetVMName = this.target.getName() + " VM";
     }
 
     @Override
     public void run() {
         long targetSize = 0;
-        String threadName = this.getName();
         File successFile = new File(this.target, "_SUCCESS");
         while (!successFile.exists()) {
             try {
@@ -32,7 +35,7 @@ public class CheckThread extends Thread {
             }
             targetSize = FileUtils.sizeOfDirectory(this.target);
             double progress = ((double) targetSize / (double) this.sourceSize) * 100;
-            System.out.printf("%s %,d / %,d = %.2f%%\n", threadName, targetSize, this.sourceSize, progress);
+            System.out.printf("%s %,d / %,d = %.2f%%\n", this.targetVMName, targetSize, this.sourceSize, progress);
         }
         successFile.delete();
     }

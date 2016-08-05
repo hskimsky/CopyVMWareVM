@@ -4,10 +4,12 @@ import com.tistory.hskimsky.core.AbstractJob;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Haneul Kim
@@ -24,6 +26,8 @@ public class Main extends AbstractJob {
     private List<String> targetVMNames;
 
     private String encoding;
+
+    private ExecutorService executor;
 
     private Map<String, String> params;
 
@@ -50,6 +54,10 @@ public class Main extends AbstractJob {
         this.targetVMNames = Arrays.asList(params.get(keyFor("targetVMNames")).split(","));
         this.encoding = params.get(keyFor("encoding"));
 
+        int vmCount = this.targetVMNames.size();
+        System.out.println("copy vm Count = " + vmCount);
+        this.executor = Executors.newFixedThreadPool(vmCount * 2);
+
         execute();
 
         return APP_SUCCESS;
@@ -61,7 +69,6 @@ public class Main extends AbstractJob {
             throw new IllegalArgumentException("Source path '" + source + "' does not exists.");
         }
 
-        List<Thread> threads = new ArrayList<>();
         long startTime = System.nanoTime();
         for (String targetVMName : this.targetVMNames) {
             File target = new File(this.targetPath, targetVMName);
@@ -71,19 +78,16 @@ public class Main extends AbstractJob {
             target.mkdirs();
 
             CopyNMoveThread copyNMoveThread = new CopyNMoveThread(source, target, this.encoding);
-            copyNMoveThread.setName(targetVMName + " VM");
-            copyNMoveThread.start();
-
             CheckThread checkThread = new CheckThread(copyNMoveThread.getSourceSize(), target);
-            checkThread.setName(targetVMName + " VM");
-            checkThread.start();
 
-            threads.add(copyNMoveThread);
-            threads.add(checkThread);
+            this.executor.execute(copyNMoveThread);
+            this.executor.execute(checkThread);
         }
-        for (Thread thread : threads) {
-            thread.join();
-        }
+
+        this.executor.shutdown();
+
+        this.executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
         System.out.println("All VMs copy end.");
         long endTime = System.nanoTime();
         System.out.printf("%s copy elapsed = %d (ms)\n", "All VMs", (endTime - startTime) / 1000000);

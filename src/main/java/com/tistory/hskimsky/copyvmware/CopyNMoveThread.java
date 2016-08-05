@@ -10,7 +10,7 @@ import java.io.*;
  * @author Haneul Kim
  * @version 0.1
  */
-public class CopyNMoveThread extends Thread {
+public class CopyNMoveThread implements Runnable {
 
     private File source;
 
@@ -20,16 +20,21 @@ public class CopyNMoveThread extends Thread {
 
     private long sourceSize;
 
+    private String targetVMName;
+
     public CopyNMoveThread(File source, File target, String encoding) {
         this.source = source;
         this.target = target;
         this.encoding = encoding;
 
         this.sourceSize = FileUtils.sizeOfDirectory(source);
+
+        this.targetVMName = this.target.getName() + " VM";
     }
 
     @Override
     public void run() {
+        Thread.currentThread().setName(this.targetVMName);
         try {
             copyVM();
             rename();
@@ -40,7 +45,7 @@ public class CopyNMoveThread extends Thread {
     }
 
     private void copyVM() throws IOException {
-        System.out.println(this.getName() + " copy start!!");
+        System.out.println(this.targetVMName + " copy start!!");
         long startTime = System.nanoTime();
         // except log files
         FileUtils.copyDirectory(this.source, this.target, new FileFilter() {
@@ -51,8 +56,8 @@ public class CopyNMoveThread extends Thread {
         });
         long endTime = System.nanoTime();
         long elapsedMillis = (endTime - startTime) / 1000000;
-        System.out.printf("%s copy elapsed = %d (ms)\n", this.getName(), elapsedMillis);
-        System.out.println(this.getName() + " copy end!!");
+        System.out.printf("%s copy elapsed = %d (ms)\n", this.targetVMName, elapsedMillis);
+        System.out.println(this.targetVMName + " copy end!!");
 
         createSuccessFile();
     }
