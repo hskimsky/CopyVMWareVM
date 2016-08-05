@@ -5,4 +5,4 @@
 git clone https://github.com/HaNeul-Kim/CopyVMWareVM  
 cd CopyVMWareVM  
 mvn clean install -DskipTests  
-java -jar CopyVMWare-0.1-SNAPSHOT.jar --sourcePath /path/to/source/vm --sourceVMName centos_6.7_template --targetPath /path/to/target/vm --targetVMNames test1,test2 --encoding UTF-8  
+java -jar target/CopyVMWare-0.1-SNAPSHOT.jar --sourcePath /path/to/source/vm --sourceVMName centos_6.7_template --targetPath /path/to/target/vm --targetVMNames test1,test2 --encoding UTF-8
