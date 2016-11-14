@@ -1,12 +1,12 @@
 package com.tistory.hskimsky.copyvmware;
 
 import com.tistory.hskimsky.core.AbstractJob;
+import com.tistory.hskimsky.util.NativeUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +16,10 @@ import java.util.concurrent.TimeUnit;
  * @version 0.1
  */
 public class Main extends AbstractJob {
+
+    public static final String FUSION_VM_NAME_POSTFIX = ".vmwarevm";
+
+    private boolean isMac;
 
     private String sourcePath;
 
@@ -37,22 +41,26 @@ public class Main extends AbstractJob {
     }
 
     public int run(String[] args) throws Exception {
-        addOption("sourcePath", "sp", "원본 VM 경로", "H:\\vm\\Linux");
-        addOption("sourceVMName", "sv", "원본 VM 이름", "centos_6.7_template");
-        addOption("targetPath", "tp", "타겟 VM 경로", "H:\\vm\\Linux");
+//        addOption("sourcePath", "sp", "원본 VM 경로", "H:\\vm\\Linux");
+        addOption("sourcePath", "sp", "원본 VM 경로", "/Users/cloudine/Documents/Virtual Machines.localized");
+//        addOption("sourceVMName", "sv", "원본 VM 이름", "centos_6.7_template");
+        addOption("sourceVMName", "sv", "원본 VM 이름", "template");
+//        addOption("targetPath", "tp", "타겟 VM 경로", "H:\\vm\\Linux");
+        addOption("targetPath", "tp", "타겟 VM 경로", "/Users/cloudine/Documents/Virtual Machines.localized");
         addOption("targetVMNames", "tvs", "타겟 VM 이름들 (comma separated)", true);
         addOption("encoding", "e", "file encoding", "UTF-8");
-        params = parseArguments(args);
+        this.params = parseArguments(args);
 
         if (params == null || params.size() == 0) {
             return APP_FAIL;
         }
 
-        this.sourcePath = params.get(keyFor("sourcePath"));
-        this.sourceVMName = params.get(keyFor("sourceVMName"));
-        this.targetPath = params.get(keyFor("targetPath"));
-        this.targetVMNames = Arrays.asList(params.get(keyFor("targetVMNames")).split(","));
-        this.encoding = params.get(keyFor("encoding"));
+        this.isMac = NativeUtils.getOS() == NativeUtils.OS.MAC;
+        this.sourcePath = this.params.get(keyFor("sourcePath"));
+        this.sourceVMName = this.params.get(keyFor("sourceVMName")) + (this.isMac ? FUSION_VM_NAME_POSTFIX : "");
+        this.targetPath = this.params.get(keyFor("targetPath"));
+        this.targetVMNames = Arrays.asList(this.params.get(keyFor("targetVMNames")).split(","));
+        this.encoding = this.params.get(keyFor("encoding"));
 
         int vmCount = this.targetVMNames.size();
         System.out.println("copy vm Count = " + vmCount);
@@ -66,26 +74,43 @@ public class Main extends AbstractJob {
     private void execute() throws IOException, InterruptedException {
         File source = new File(this.sourcePath, this.sourceVMName);
         if (!source.exists()) {
-            throw new IllegalArgumentException("Source path '" + source + "' does not exists.");
+            throw new FileNotFoundException("Source path '" + source + "' does not exists.");
         }
 
-        long startTime = System.nanoTime();
+        List<Runnable> startThreads = new ArrayList<>();
         for (String targetVMName : this.targetVMNames) {
-            File target = new File(this.targetPath, targetVMName);
+            File target = new File(this.targetPath, targetVMName + (this.isMac ? FUSION_VM_NAME_POSTFIX : ""));
             if (target.exists()) {
-                throw new IllegalArgumentException("Target path '" + target + "' already exists.");
+                System.err.println("Target path '" + target + "' already exists.");
+                System.err.print("Did you overwrite? ");
+
+                Scanner scanner = new Scanner(System.in);
+                String input = scanner.nextLine().toLowerCase();
+                switch (input) {
+                    case "y":
+                    case "yes":
+                        target.delete();
+                        System.err.println(target + " is deleted!!");
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Target path '" + target + "' already exists.");
+                }
             }
             target.mkdirs();
 
-            CopyNMoveThread copyNMoveThread = new CopyNMoveThread(source, target, this.encoding);
+            CopyNMoveThread copyNMoveThread = new CopyNMoveThread(this.isMac, source, target, this.encoding);
             CheckThread checkThread = new CheckThread(copyNMoveThread.getSourceSize(), target);
 
-            this.executor.execute(copyNMoveThread);
-            this.executor.execute(checkThread);
+            startThreads.add(copyNMoveThread);
+            startThreads.add(checkThread);
+
         }
-
+        long startTime = System.nanoTime();
+        /*for (Runnable thread : startThreads) {
+            this.executor.execute(thread);
+        }*/
+        startThreads.forEach(this.executor::execute);
         this.executor.shutdown();
-
         this.executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
         System.out.println("All VMs copy end.");
