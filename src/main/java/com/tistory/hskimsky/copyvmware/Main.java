@@ -24,20 +24,12 @@ public class Main extends AbstractJob {
   public static final String FUSION_VM_NAME_POSTFIX = ".vmwarevm";
 
   private boolean isMac;
-
   private String sourcePath;
-
   private String sourceVMName;
-
   private String targetPath;
-
   private List<String> targetVMNames;
-
   private String encoding;
-
   private ExecutorService executor;
-
-  private Map<String, String> params;
 
   public static void main(String[] args) throws Exception {
     int result = new Main().run(args);
@@ -53,18 +45,18 @@ public class Main extends AbstractJob {
     addOption("targetPath", "tp", "타겟 VM 경로", "/Users/cloudine/Documents/Virtual Machines.localized");
     addOption("targetVMNames", "tvs", "타겟 VM 이름들 (comma separated)", true);
     addOption("encoding", "e", "file encoding", "UTF-8");
-    this.params = parseArguments(args);
+    Map<String, String> params = parseArguments(args);
 
     if (params == null || params.size() == 0) {
       return APP_FAIL;
     }
 
     this.isMac = NativeUtils.getOS() == NativeUtils.OS.MAC;
-    this.sourcePath = this.params.get(keyFor("sourcePath"));
-    this.sourceVMName = this.params.get(keyFor("sourceVMName")) + (this.isMac ? FUSION_VM_NAME_POSTFIX : "");
-    this.targetPath = this.params.get(keyFor("targetPath"));
-    this.targetVMNames = Arrays.asList(this.params.get(keyFor("targetVMNames")).split(","));
-    this.encoding = this.params.get(keyFor("encoding"));
+    this.sourcePath = params.get(keyFor("sourcePath"));
+    this.sourceVMName = params.get(keyFor("sourceVMName")) + (this.isMac ? FUSION_VM_NAME_POSTFIX : "");
+    this.targetPath = params.get(keyFor("targetPath"));
+    this.targetVMNames = Arrays.asList(params.get(keyFor("targetVMNames")).split(","));
+    this.encoding = params.get(keyFor("encoding"));
 
     int vmCount = this.targetVMNames.size();
     System.out.println("copy vm Count = " + vmCount);

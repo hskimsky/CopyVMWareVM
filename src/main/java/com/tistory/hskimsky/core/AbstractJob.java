@@ -11,9 +11,7 @@ import org.apache.commons.cli2.builder.GroupBuilder;
 import org.apache.commons.cli2.commandline.Parser;
 import org.apache.commons.cli2.util.HelpFormatter;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +28,7 @@ public class AbstractJob {
 
   public static final int APP_FAIL = 1;
 
-  private static Map<String, String> argMap;
-
-  private static List<Option> options = new LinkedList<>();
+  private static final List<Option> options = new LinkedList<>();
 
   protected AbstractJob() {
   }
@@ -110,7 +106,7 @@ public class AbstractJob {
       ArgumentBuilder argBuilder = new ArgumentBuilder().withName(name).withMinimum(1).withMaximum(1);
 
       if (defaultValue != null) {
-        argBuilder = argBuilder.withDefault(defaultValue);
+        argBuilder.withDefault(defaultValue);
       }
 
       optBuilder.withArgument(argBuilder.create());
@@ -128,7 +124,7 @@ public class AbstractJob {
    * 인자의 key는 옵션명에 되며 옵션명은 '--'을 prefix로 갖는다.
    * 따라서 옵션을 기준으로 {@code Map<String,String>} 에서 찾고자 하는 경우 반드시 옵션명에 '--'을 붙이도록 한다.
    */
-  public static Map<String, String> parseArguments(String[] args) throws Exception {
+  public static Map<String, String> parseArguments(String[] args) {
     Option helpOpt = addOption(new DefaultOptionBuilder().withLongName("help").withDescription("도움말을 출력합니다.").withShortName("h").create());
 
     GroupBuilder groupBuilder = new GroupBuilder().withName("Spark Job 옵션:");
@@ -156,12 +152,11 @@ public class AbstractJob {
       return null;
     }
 
-    argMap = new TreeMap<>();
-    maybePut(argMap, cmdLine, options.toArray(new Option[options.size()]));
+    Map<String, String> argMap = new TreeMap<>();
+    maybePut(argMap, cmdLine, options.toArray(new Option[0]));
     System.out.println("Command line arguments: ");
     Set<String> keySet = argMap.keySet();
-    for (Iterator<String> iterator = keySet.iterator(); iterator.hasNext(); ) {
-      String key = iterator.next();
+    for (String key : keySet) {
       System.out.println("   " + key + " = " + argMap.get(key));
     }
     return argMap;
@@ -196,9 +191,8 @@ public class AbstractJob {
    *
    * @param group Option Group
    * @param oe    예외
-   * @throws IOException
    */
-  public static void printHelpWithGenericOptions(Group group, OptionException oe) throws IOException {
+  public static void printHelpWithGenericOptions(Group group, OptionException oe) {
     Options ops = new Options();
     org.apache.commons.cli.HelpFormatter fmt = new org.apache.commons.cli.HelpFormatter();
     fmt.printHelp("<command> [Generic Options] [Job-Specific Options]", "Generic Options:", ops, "");
@@ -206,24 +200,20 @@ public class AbstractJob {
     HelpFormatter formatter = new HelpFormatter();
     formatter.setGroup(group);
     formatter.setPrintWriter(pw);
-    formatter.setException(oe);
-    formatter.print();
+
+    if (oe == null) {
+      formatter.printHelp();
+      formatter.setFooter("Job을 실행하는데 필요한 디렉토리를 지정하십시오.");
+      formatter.printFooter();
+    } else {
+      formatter.setException(oe);
+      formatter.print();
+    }
+
     pw.flush();
   }
 
-  public static void printHelpWithGenericOptions(Group group) throws IOException {
-    Options ops = new Options();
-    org.apache.commons.cli.HelpFormatter fmt = new org.apache.commons.cli.HelpFormatter();
-    fmt.printHelp("<command> [Generic Options] [Job-Specific Options]", "Generic Options:", ops, "");
-
-    PrintWriter pw = new PrintWriter(System.out, true);
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.setGroup(group);
-    formatter.setPrintWriter(pw);
-    formatter.printHelp();
-    formatter.setFooter("Job을 실행하는데 필요한 디렉토리를 지정하십시오.");
-    formatter.printFooter();
-
-    pw.flush();
+  public static void printHelpWithGenericOptions(Group group) {
+    printHelpWithGenericOptions(group, null);
   }
 }

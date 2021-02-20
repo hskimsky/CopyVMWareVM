@@ -5,7 +5,7 @@ package com.tistory.hskimsky.util;
  */
 public class NativeUtils {
 
-  private static String os = System.getProperty("os.name").toLowerCase();
+  private static final String os = System.getProperty("os.name").toLowerCase();
 
   public enum OS {
     WINDOWS, MAC, UNIX, SOLARIS
@@ -26,18 +26,18 @@ public class NativeUtils {
   }
 
   private static boolean isWindows() {
-    return (os.indexOf("win") >= 0);
+    return os.contains("win");
   }
 
   private static boolean isMac() {
-    return (os.indexOf("mac") >= 0);
+    return os.contains("mac");
   }
 
   private static boolean isUnix() {
-    return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0);
+    return os.contains("nix") || os.contains("nux") || os.indexOf("aix") > 0;
   }
 
   private static boolean isSolaris() {
-    return (os.indexOf("sunos") >= 0);
+    return os.contains("sunos");
   }
 }

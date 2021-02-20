@@ -10,16 +10,13 @@ import java.io.File;
  */
 public class CheckThread implements Runnable {
 
-  private long sourceSize;
-
-  private File target;
-
-  private String targetVMName;
+  private final long sourceSize;
+  private final File target;
+  private final String targetVMName;
 
   public CheckThread(long sourceSize, File target) {
     this.sourceSize = sourceSize;
     this.target = target;
-
     this.targetVMName = this.target.getName() + " VM";
   }
 
