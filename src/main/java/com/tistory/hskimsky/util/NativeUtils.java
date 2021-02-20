@@ -7,6 +7,8 @@ public class NativeUtils {
 
   private static final String os = System.getProperty("os.name").toLowerCase();
 
+  public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
   public enum OS {
     WINDOWS, MAC, UNIX, SOLARIS
   }

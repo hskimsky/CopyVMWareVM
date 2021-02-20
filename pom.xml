@@ -6,7 +6,7 @@
 
   <groupId>com.tistory.hskimsky</groupId>
   <artifactId>CopyVMWare</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.5</version>
 
   <dependencies>
     <dependency>

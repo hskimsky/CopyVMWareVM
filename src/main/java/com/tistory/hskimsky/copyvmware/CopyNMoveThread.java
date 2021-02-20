@@ -1,5 +1,6 @@
 package com.tistory.hskimsky.copyvmware;
 
+import com.tistory.hskimsky.util.NativeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -7,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -21,14 +21,16 @@ public class CopyNMoveThread implements Runnable {
   private final boolean isMac;
   private final File source;
   private final File target;
+  private final String autoConfDir;
   private final String encoding;
   private final long sourceSize;
   private final String targetVMName;
 
-  public CopyNMoveThread(boolean isMac, File source, File target, String encoding) {
+  public CopyNMoveThread(boolean isMac, File source, File target, String autoConfDir, String encoding) {
     this.isMac = isMac;
     this.source = source;
     this.target = target;
+    this.autoConfDir = autoConfDir;
     this.encoding = encoding;
     this.sourceSize = FileUtils.sizeOfDirectory(source);
     this.targetVMName = this.target.getName() + " VM";
@@ -71,7 +73,7 @@ public class CopyNMoveThread implements Runnable {
       String targetVMName = getVMName(this.target.getName());
 
       String targetName = StringUtils.replace(originalName, sourceVMName, targetVMName);
-      file.renameTo(new File(file.getParent() + System.getProperty("file.separator") + targetName));
+      file.renameTo(new File(file.getParent() + NativeUtils.FILE_SEPARATOR + targetName));
     });
   }
 
@@ -84,14 +86,16 @@ public class CopyNMoveThread implements Runnable {
   }
 
   private void updateContents() throws IOException {
-    final String targetVMName = getVMName(this.target.getName());
-    File[] updateTargetLists = this.target.listFiles((dir, name) -> (String.format("%s.vmdk", targetVMName)).equals(name) || name.endsWith(".vmx") || name.endsWith(".vmxf"));
+    String targetVMName = getVMName(this.target.getName());
+    File[] updateTargetLists = this.target.listFiles((dir, name) ->
+      (String.format("%s.vmdk", targetVMName)).equals(name) || name.endsWith(".vmx") || name.endsWith(".vmxf"));
     Arrays.stream(Objects.requireNonNull(updateTargetLists)).forEach(file -> {
       try {
-        String content = IOUtils.toString(new FileInputStream(file), this.encoding);
+        String sourceContent = IOUtils.toString(new FileInputStream(file), this.encoding);
         String sourceVMName = getVMName(this.source.getName());
-        String updatedContent = StringUtils.replace(content, sourceVMName, targetVMName);
-        IOUtils.write(updatedContent, new FileOutputStream(file), this.encoding);
+        String tempContent1 = StringUtils.replace(sourceContent, sourceVMName, targetVMName);
+        String finalContent = StringUtils.replace(tempContent1, autoConfDir, autoConfDir + NativeUtils.FILE_SEPARATOR + targetVMName);
+        IOUtils.write(finalContent, new FileOutputStream(file), this.encoding);
       } catch (IOException e) {
         e.printStackTrace();
       }
