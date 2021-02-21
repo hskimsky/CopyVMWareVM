@@ -14,6 +14,159 @@ java -jar target/CopyVMWare-0.5.jar --sourcePath /path/to/source/vm --sourceVMNa
 
 # Preparation
 
+## VM Tools 설치
+
+```shell
+mkdir /mnt/cdrom
+mount /dev/cdrom /mnt/cdrom
+cd /tmp
+rm -rf vmware-tools-distrib
+tar zxpf /mnt/cdrom/VMwareTools-x.x.x-yyyy.tar.gz
+umount /dev/cdrom
+cd vmware-tools-distrib
+./vmware-install.pl
+# 물음에 답하면 됨
+```
+
+```text
+[root@template76:/tmp/vmware-tools-distrib]# ./vmware-install.pl
+The installer has detected an existing installation of open-vm-tools packages
+on this system and will not attempt to remove and replace these user-space
+applications. It is recommended to use the open-vm-tools packages provided by
+the operating system. If you do not want to use the existing installation of
+open-vm-tools packages and use VMware Tools, you must uninstall the
+open-vm-tools packages and re-run this installer.
+The packages that need to be removed are:
+open-vm-tools
+The installer will next check if there are any missing kernel drivers. Type yes
+if you want to do this, otherwise type no [yes]
+
+INPUT: [yes]  default
+
+Creating a new VMware Tools installer database using the tar4 format.
+
+Installing VMware Tools.
+
+In which directory do you want to install the binary files?
+[/usr/bin]
+
+INPUT: [/usr/bin]  default
+
+What is the directory that contains the init directories (rc0.d/ to rc6.d/)?
+[/etc/rc.d]
+
+INPUT: [/etc/rc.d]  default
+
+What is the directory that contains the init scripts?
+[/etc/rc.d/init.d]
+
+INPUT: [/etc/rc.d/init.d]  default
+
+In which directory do you want to install the daemon files?
+[/usr/sbin]
+
+INPUT: [/usr/sbin]  default
+
+In which directory do you want to install the library files?
+[/usr/lib/vmware-tools]
+
+INPUT: [/usr/lib/vmware-tools]  default
+
+The path "/usr/lib/vmware-tools" does not exist currently. This program is
+going to create it, including needed parent directories. Is this what you want?
+[yes]
+
+INPUT: [yes]  default
+
+In which directory do you want to install the documentation files?
+[/usr/share/doc/vmware-tools]
+
+INPUT: [/usr/share/doc/vmware-tools]  default
+
+The path "/usr/share/doc/vmware-tools" does not exist currently. This program
+is going to create it, including needed parent directories. Is this what you
+want? [yes]
+
+INPUT: [yes]  default
+
+The installation of VMware Tools 10.3.22 build-15902021 for Linux completed
+successfully. You can decide to remove this software from your system at any
+time by invoking the following command: "/usr/bin/vmware-uninstall-tools.pl".
+
+Before running VMware Tools for the first time, you need to configure it by
+invoking the following command: "/usr/bin/vmware-config-tools.pl". Do you want
+this program to invoke the command for you now? [yes]
+
+INPUT: [yes]  default
+
+
+You have chosen to install VMware Tools on top of an open-vm-tools package.
+You will now be given the option to replace some commands provided by
+open-vm-tools.  Please note that if you replace any commands at this time and
+later remove VMware Tools, it may be necessary to re-install the open-vm-tools.
+
+The file /usr/bin/vmware-hgfsclient that this program was about to install
+already exists.  Overwrite? [no] yes
+
+INPUT: [yes]
+
+The file /usr/bin/vmhgfs-fuse that this program was about to install already
+exists.  Overwrite? [no] yes
+
+INPUT: [yes]
+
+Initializing...
+
+
+Making sure services for VMware Tools are stopped.
+
+Stopping vmware-tools (via systemctl):  [  OK  ]
+
+
+The module vmci has already been installed on this system by another installer
+or package and will not be modified by this installer.
+
+The module vsock has already been installed on this system by another installer
+or package and will not be modified by this installer.
+
+The module vmxnet3 has already been installed on this system by another
+installer or package and will not be modified by this installer.
+
+The module pvscsi has already been installed on this system by another
+installer or package and will not be modified by this installer.
+
+The module vmmemctl has already been installed on this system by another
+installer or package and will not be modified by this installer.
+
+The VMware Host-Guest Filesystem allows for shared folders between the host OS
+and the guest OS in a Fusion or Workstation virtual environment.  Do you wish
+to enable this feature? [yes]
+
+INPUT: [yes]  default
+
+The vmxnet driver is no longer supported on kernels 3.3 and greater. Please
+upgrade to a newer virtual NIC. (e.g., vmxnet3 or e1000e)
+
+
+Skipping configuring automatic kernel modules as no drivers were installed by
+this installer.
+
+
+Skipping rebuilding initrd boot image for kernel as no drivers to be included
+in boot image were installed by this installer.
+
+The configuration of VMware Tools 10.3.22 build-15902021 for Linux for this
+running kernel completed successfully.
+
+Enjoy,
+
+--the VMware team
+
+[root@template76:/tmp/vmware-tools-distrib]#
+```
+
+`/mnt/hgfs/` 에 공유한 directory 가 나옴
+
 ## Template VM
 
 host 의 특정 directory 를 vm 에 공유 설정함
