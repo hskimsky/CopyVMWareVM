@@ -14,9 +14,45 @@ java -jar target/CopyVMWare-0.5.jar --sourcePath /path/to/source/vm --sourceVMNa
 
 # Preparation
 
+## VM Tools Dependency 설치
+
+아래 방법들 중 한가지 이상 수행해야 함
+
+### Kernel Source 설치
+
+kernel version 에 맞는 source 가 설치되는지 확인 필요
+
+```shell
+uname -a
+yum install -y kernel-devel
+```
+
+```text
+[root@template79:~]# uname -a
+Linux template79.sky.local 3.10.0-1160.el7.x86_64 #1 SMP Mon Oct 19 16:18:59 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+[root@template79:~]#
+```
+
+설치하고 나면 `/usr/src/kernels/` 에 설치됨
+
+```text
+[root@template79:~]# ll /usr/src/kernels/
+total 4
+drwxr-xr-x.  3 root root   41 May 16 15:37 ./
+drwxr-xr-x.  4 root root   34 May 16 15:31 ../
+drwxr-xr-x. 22 root root 4096 May 16 15:37 3.10.0-1160.25.1.el7.x86_64/
+```
+
+### policycoreuk,tils-python 설치
+
+```shell
+yum install -y policycoreutils-python
+```
+
 ## VM Tools 설치
 
 ```shell
+yum install -y perl
 mkdir /mnt/cdrom
 mount /dev/cdrom /mnt/cdrom
 cd /tmp
@@ -163,6 +199,10 @@ Enjoy,
 --the VMware team
 
 [root@template76:/tmp/vmware-tools-distrib]#
+```
+
+```shell
+systemctl status vmware-tools
 ```
 
 `/mnt/hgfs/` 에 공유한 directory 가 나옴
