@@ -43,7 +43,7 @@ drwxr-xr-x.  4 root root   34 May 16 15:31 ../
 drwxr-xr-x. 22 root root 4096 May 16 15:37 3.10.0-1160.25.1.el7.x86_64/
 ```
 
-### policycoreuk,tils-python 설치
+### policycoreutils-python 설치
 
 ```shell
 yum install -y policycoreutils-python
