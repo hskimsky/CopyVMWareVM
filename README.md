@@ -207,6 +207,18 @@ systemctl status vmware-tools
 
 `/mnt/hgfs/` 에 공유한 directory 가 나옴
 
+그래도 안나온다면
+
+아래 두줄 중 한줄을 `/etc/fstab` 에 추가함
+
+```text
+vmhgfs-fuse /mnt/hgfs fuse             defaults,allow_other 0 0
+```
+
+```text
+.host:/     /mnt/hgfs fuse.vmhgfs-fuse defaults,allow_other 0 0
+```
+
 ## Template VM
 
 host 의 특정 directory 를 vm 에 공유 설정함
