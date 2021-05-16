@@ -352,8 +352,8 @@ echo "NEW_IP=${NEW_IP}"
 echo "NEW_HOSTNAME=${NEW_HOSTNAME}"
 
 sed -i "s/192.168.181.128/${NEW_IP}/g" /etc/sysconfig/network-scripts/ifcfg-ens33
-hostnamectl set-hostname ${NEW_HOSTNAME}
 systemctl restart network
+hostnamectl set-hostname ${NEW_HOSTNAME} --static
 
 systemctl disable rc-local
 systemctl stop    rc-local
