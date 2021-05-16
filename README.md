@@ -219,6 +219,81 @@ vmhgfs-fuse /mnt/hgfs fuse             defaults,allow_other 0 0
 .host:/     /mnt/hgfs fuse.vmhgfs-fuse defaults,allow_other 0 0
 ```
 
+## epel-release baseurl 수정
+
+epel-release baseurl 을 kakao 로 수정
+
+```shell
+yum install -y epel-release
+
+mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.template
+mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.template
+
+cat > /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux 7 - \$basearch
+#baseurl=http://download.fedoraproject.org/pub/epel/7/\$basearch
+baseurl=http://mirror.kakao.com/epel/7/\$basearch
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=\$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - \$basearch - Debug
+#baseurl=http://download.fedoraproject.org/pub/epel/7/\$basearch/debug
+baseurl=http://mirror.kakao.com/epel/7/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=\$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+[epel-source]
+name=Extra Packages for Enterprise Linux 7 - \$basearch - Source
+#baseurl=http://download.fedoraproject.org/pub/epel/7/SRPMS
+baseurl=http://mirror.kakao.com/epel/7/SRPMS
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=\$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+EOF
+
+cat > /etc/yum.repos.d/epel-testing.repo << EOF
+[epel-testing]
+name=Extra Packages for Enterprise Linux 7 - Testing - \$basearch
+#baseurl=http://download.fedoraproject.org/pub/epel/testing/7/\$basearch
+baseurl=http://mirror.kakao.com/epel/testing/7/\$basearch
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-epel7&arch=\$basearch
+failovermethod=priority
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[epel-testing-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - Testing - \$basearch - Debug
+#baseurl=http://download.fedoraproject.org/pub/epel/testing/7/\$basearch/debug
+baseurl=http://mirror.kakao.com/epel/testing/7/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-debug-epel7&arch=\$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+[epel-testing-source]
+name=Extra Packages for Enterprise Linux 7 - Testing - \$basearch - Source
+#baseurl=http://download.fedoraproject.org/pub/epel/testing/7/SRPMS
+baseurl=http://mirror.kakao.com/epel/testing/7/SRPMS
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-source-epel7&arch=\$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+EOF
+```
+
 ## Template VM
 
 host 의 특정 directory 를 vm 에 공유 설정함
