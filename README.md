@@ -2,14 +2,14 @@
 
 * 원본 VM 으로부터 복사 후 파일명들을 바꾸고 내용을 알맞게 바꿉니다.
 * IP, HOSTNAME 을 자동으로 설정합니다.
+* cores, memory 를 설정합니다.
 
 # Build
 
 ```shell
-git clone https://github.com/HaNeul-Kim/CopyVMWareVM  
-cd CopyVMWareVM  
+git clone https://github.com/HaNeul-Kim/CopyVMWareVM
+cd CopyVMWareVM
 mvn clean install -DskipTests dependency:sources
-java -jar target/CopyVMWare-0.5.jar --sourcePath /path/to/source/vm --sourceVMName centos_6.7_template --targetPath /path/to/target/vm --targetVMNames test1,test2 --encoding UTF-8
 ```
 
 # Preparation
@@ -369,27 +369,17 @@ cat /etc/resolv.conf
 Windows 의 경우 다음 명령어 실행
 
 ```shell
-java -jar E:\vm\CopyVMWare-0.5.jar `
- --autoConfPath E:\vm\conf `
- --sourcePath   E:\vm\linux `
- --sourceVMName template76 `
- --targetPath   F:\vm\linux `
- --targetVMNames nfsserver,nfsclient `
- --targetVMIPs   192.168.181.211,192.168.181.212 `
- --targetDomain  sky.local
+java -jar E:\vm\CopyVMWare-1.0.0.jar `
+ --force \
+ --yaml E:\vm\conf\tt05.yaml
 ```
 
 *nix 의 경우 다음 명령어 실행
 
 ```shell
-java -jar /path/to/CopyVMWare-0.5.jar \
- --autoConfPath /path/to/conf \
- --sourcePath   /path/to/linux \
- --sourceVMName template76 \
- --targetPath   /path/to/linux \
- --targetVMNames nfsserver,nfsclient \
- --targetVMIPs   192.168.181.211,192.168.181.212 \
- --targetDomain  sky.local
+java -jar /path/to/CopyVMWare-1.0.0.jar \
+ --force \
+ --yaml /path/to/yaml
 ```
 
 VM On
