@@ -1,9 +1,12 @@
 package com.tistory.hskimsky.copyvmware;
 
+import com.tistory.hskimsky.jcommander.CloneSpec;
 import com.tistory.hskimsky.util.NativeUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,27 +21,21 @@ import java.util.Objects;
  */
 public class CopyNMoveThread implements Runnable {
 
-  private final boolean isMac;
-  private final File source;
-  private final File target;
-  private final String autoConfDir;
-  private final String encoding;
-  private final long sourceSize;
-  private final String targetVMName;
+  private static final Logger logger = LoggerFactory.getLogger(CopyNMoveThread.class);
 
-  public CopyNMoveThread(boolean isMac, File source, File target, String autoConfDir, String encoding) {
-    this.isMac = isMac;
-    this.source = source;
-    this.target = target;
-    this.autoConfDir = autoConfDir;
-    this.encoding = encoding;
-    this.sourceSize = FileUtils.sizeOfDirectory(source);
-    this.targetVMName = this.target.getName() + " VM";
+  private final CloneSpec cloneSpec;
+  private final File sourceDir;
+  private final File targetDir;
+
+  public CopyNMoveThread(CloneSpec cloneSpec) {
+    this.cloneSpec = cloneSpec;
+    this.sourceDir = new File(this.cloneSpec.getTemplatePath());
+    this.targetDir = new File(this.cloneSpec.getPath(), this.cloneSpec.getDisplayName());
   }
 
   @Override
   public void run() {
-    Thread.currentThread().setName(this.targetVMName);
+    Thread.currentThread().setName(this.cloneSpec.getDisplayName());
     try {
       copyVM();
       rename();
@@ -49,60 +46,56 @@ public class CopyNMoveThread implements Runnable {
   }
 
   private void copyVM() throws IOException {
-    System.out.println(this.targetVMName + " copy start!!");
+    String displayName = this.targetDir.getName();
+    logger.info("{} copy start!!", displayName);
     long startTime = System.nanoTime();
     // except log files
-    FileUtils.copyDirectory(this.source, this.target, pathname -> !pathname.getName().endsWith(".log"));
+    FileUtils.copyDirectory(this.sourceDir, this.targetDir, pathname -> !pathname.getName().endsWith(".log"));
     long endTime = System.nanoTime();
     long elapsedMillis = (endTime - startTime) / 1000000;
-    System.out.printf("%s copy elapsed = %d (ms)\n", this.targetVMName, elapsedMillis);
-    System.out.println(this.targetVMName + " copy end!!");
+    logger.info("{} copy elapsed = {} (ms)", displayName, elapsedMillis);
+    logger.info("{} copy end!!!!", displayName);
 
     createSuccessFile();
   }
 
   private void createSuccessFile() throws IOException {
-    new File(this.target, "_SUCCESS").createNewFile();
+    new File(this.targetDir, "_SUCCESS").createNewFile();
   }
 
   private void rename() {
-    Arrays.stream(Objects.requireNonNull(this.target.listFiles())).forEach(file -> {
+    String sourceVMName = this.sourceDir.getName();
+    String targetVMName = this.targetDir.getName();
+    Arrays.stream(Objects.requireNonNull(this.targetDir.listFiles())).forEach(file -> {
       String originalName = file.getName();
-
-      String sourceVMName = getVMName(this.source.getName());
-      String targetVMName = getVMName(this.target.getName());
 
       String targetName = StringUtils.replace(originalName, sourceVMName, targetVMName);
       file.renameTo(new File(file.getParent() + NativeUtils.FILE_SEPARATOR + targetName));
     });
   }
 
-  /**
-   * remove postfix(.vmwarevm) in VMWare Fusion
-   * return real vm name
-   */
-  private String getVMName(String name) {
-    return this.isMac ? name.substring(0, name.length() - Main.FUSION_VM_NAME_POSTFIX.length()) : name;
-  }
-
   private void updateContents() throws IOException {
-    String targetVMName = getVMName(this.target.getName());
-    File[] updateTargetLists = this.target.listFiles((dir, name) ->
+    String targetVMName = this.targetDir.getName();
+    File[] updateTargetLists = this.targetDir.listFiles((dir, name) ->
       (String.format("%s.vmdk", targetVMName)).equals(name) || name.endsWith(".vmx") || name.endsWith(".vmxf"));
+    int numvcpus = this.cloneSpec.getNumvcpus();
+    int coresPerSocket = this.cloneSpec.getCoresPerSocket();
+    int memsize = this.cloneSpec.getMemsize();
+    String description = this.cloneSpec.getDescription().replaceAll("\n", "|0D|0A");
+    String sourceVMName = this.sourceDir.getName();
     Arrays.stream(Objects.requireNonNull(updateTargetLists)).forEach(file -> {
       try {
-        String sourceContent = IOUtils.toString(new FileInputStream(file), this.encoding);
-        String sourceVMName = getVMName(this.source.getName());
+        String sourceContent = IOUtils.toString(new FileInputStream(file), Main.ENCODING);
         String tempContent1 = StringUtils.replace(sourceContent, sourceVMName, targetVMName);
-        String finalContent = StringUtils.replace(tempContent1, autoConfDir, autoConfDir + NativeUtils.FILE_SEPARATOR + targetVMName);
-        IOUtils.write(finalContent, new FileOutputStream(file), this.encoding);
+        String tempContent2 = tempContent1.replaceAll("numvcpus = \"\\d+\"", "numvcpus = \"" + numvcpus + "\"");
+        String tempContent3 = tempContent2.replaceAll("coresPerSocket = \"\\d+\"", "coresPerSocket = \"" + coresPerSocket + "\"");
+        String tempContent4 = tempContent3.replaceAll("memsize = \"\\d+\"", "memsize = \"" + memsize + "\"");
+        String tempContent5 = tempContent4.replaceAll("annotation = \".*\"", "annotation = \"" + description + "\"");
+        String finalContent = StringUtils.replace(tempContent5, Main.VM_CONF_DIR, Main.VM_CONF_DIR + NativeUtils.FILE_SEPARATOR + targetVMName);
+        IOUtils.write(finalContent, new FileOutputStream(file), Main.ENCODING);
       } catch (IOException e) {
         e.printStackTrace();
       }
     });
-  }
-
-  public long getSourceSize() {
-    return sourceSize;
   }
 }

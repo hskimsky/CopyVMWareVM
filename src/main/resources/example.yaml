@@ -1,0 +1,39 @@
+templatePath: E:\vm\linux\template79large
+displayName: example1
+hostname: example1.sky.local
+path: F:\vm\linux\example
+description: |
+  ZooKeeper Server
+  NameNode
+  ResourceManager
+  HBase Master
+ip: 192.168.181.211
+numvcpus: 8
+coresPerSocket: 4
+memsize: 8192
+---
+templatePath: E:\vm\linux\template79
+displayName: example2
+hostname: example2.sky.local
+path: F:\vm\linux\example
+description: |
+  DataNode
+  NodeManager
+  HBase RegionServer
+ip: 192.168.181.212
+numvcpus: 2
+coresPerSocket: 2
+memsize: 8192
+---
+templatePath: E:\vm\linux\template79
+displayName: example3
+hostname: example3.sky.local
+path: F:\vm\linux\example
+description: |
+  DataNode
+  NodeManager
+  HBase RegionServer
+ip: 192.168.181.213
+numvcpus: 4
+coresPerSocket: 2
+memsize: 8192
