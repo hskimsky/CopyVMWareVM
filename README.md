@@ -370,7 +370,7 @@ Windows 의 경우 다음 명령어 실행
 
 ```shell
 java -jar E:\vm\CopyVMWare-1.0.0.jar `
- --force \
+ --force `
  --yaml E:\vm\conf\tt05.yaml
 ```
 
