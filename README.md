@@ -225,7 +225,11 @@ epel-release baseurl 을 kakao 로 수정
 
 ```shell
 yum install -y epel-release
+```
 
+### CentOS 7
+
+```shell
 mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.template
 mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.template
 
@@ -290,6 +294,195 @@ baseurl=http://mirror.kakao.com/epel/testing/7/SRPMS
 failovermethod=priority
 enabled=0
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+EOF
+```
+
+### CentOS 8
+
+```shell
+mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.ori
+mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.ori
+mv /etc/yum.repos.d/epel-modular.repo /etc/yum.repos.d/epel-modular.repo.ori
+mv /etc/yum.repos.d/epel-testing-modular.repo /etc/yum.repos.d/epel-testing-modular.repo.ori
+mv /etc/yum.repos.d/epel-playground.repo /etc/yum.repos.d/epel-playground.repo.ori
+
+cat > /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/\$releasever/Everything/\$basearch
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/\$releasever/Everything/\$basearch
+enabled=1
+gpgcheck=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch - Debug
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/\$releasever/Everything/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/\$releasever/Everything/\$basearch/debug
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+
+[epel-source]
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch - Source
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/\$releasever/Everything/SRPMS
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/\$releasever/Everything/\$basearch/SRPMS
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+EOF
+
+cat > /etc/yum.repos.d/epel-testing.repo << EOF
+[epel-testing]
+name=Extra Packages for Enterprise Linux \$releasever - Testing - \$basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/testing/\$releasever/Everything/\$basearch
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/testing/\$releasever/Everything/\$basearch
+enabled=0
+gpgcheck=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
+[epel-testing-debuginfo]
+name=Extra Packages for Enterprise Linux \$releasever - Testing - \$basearch - Debug
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/testing/\$releasever/Everything/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-debug-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/testing/\$releasever/Everything/\$basearch/debug
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+
+[epel-testing-source]
+name=Extra Packages for Enterprise Linux \$releasever - Testing - \$basearch - Source
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/testing/\$releasever/Everything/SRPMS
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-source-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/testing/\$releasever/Everything/\$basearch/SRPMS
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+EOF
+
+cat > /etc/yum.repos.d/epel-modular.repo << EOF
+[epel-modular]
+name=Extra Packages for Enterprise Linux Modular \$releasever - \$basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/\$releasever/Modular/\$basearch
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-modular-\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+enabled=1
+gpgcheck=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
+[epel-modular-debuginfo]
+name=Extra Packages for Enterprise Linux Modular \$releasever - \$basearch - Debug
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/\$releasever/Modular/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-modular-debug-\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/\$releasever/Modular/\$basearch/debug/
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+
+[epel-modular-source]
+name=Extra Packages for Enterprise Linux Modular \$releasever - \$basearch - Source
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/\$releasever/Modular/SRPMS
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-modular-source-\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/\$releasever/Modular/SRPMS/
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+EOF
+
+cat > /etc/yum.repos.d/epel-testing-modular.repo << EOF
+[epel-testing-modular]
+name=Extra Packages for Enterprise Linux Modular \$releasever - Testing - \$basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/testing/\$releasever/Modular/\$basearch
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-modular-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/testing/\$releasever/Modular/\$basearch
+enabled=0
+gpgcheck=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
+[epel-testing-modular-debuginfo]
+name=Extra Packages for Enterprise Linux Modular \$releasever - Testing - \$basearch - Debug
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/testing/\$releasever/Modular/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-modular-debug-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/testing/\$releasever/Modular/\$basearch/debug
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+
+[epel-testing-modular-source]
+name=Extra Packages for Enterprise Linux Modular \$releasever - Testing - \$basearch - Source
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/testing/\$releasever/Modular/SRPMS
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=testing-modular-source-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/testing/\$releasever/Modular/SRPMS
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+EOF
+
+cat > /etc/yum.repos.d/epel-playground.repo << EOF
+[epel-playground]
+name=Extra Packages for Enterprise Linux \$releasever - Playground - \$basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/playground/\$releasever/Everything/\$basearch/os
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=playground-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/playground/\$releasever/Everything/\$basearch/os
+enabled=0
+gpgcheck=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
+[epel-playground-debuginfo]
+name=Extra Packages for Enterprise Linux \$releasever - Playground - \$basearch - Debug
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/playground/\$releasever/Everything/\$basearch/debug
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=playground-debug-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/playground/\$releasever/Everything/\$basearch/debug
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+gpgcheck=1
+
+[epel-playground-source]
+name=Extra Packages for Enterprise Linux \$releasever - Playground - \$basearch - Source
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place it's address here.
+#baseurl=https://download.example/pub/epel/playground/\$releasever/Everything/source/tree/
+#metalink=https://mirrors.fedoraproject.org/metalink?repo=playground-source-epel\$releasever&arch=\$basearch&infra=\$infra&content=\$contentdir
+baseurl=https://mirror.kakao.com/epel/playground/\$releasever/Everything/source/tree/
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
 gpgcheck=1
 EOF
 ```
@@ -362,6 +555,10 @@ chmod 644 /etc/rc.d/rc.local
 
 ping -c 1 google.com
 cat /etc/resolv.conf
+```
+
+```shell
+chmod 755 ~/set_auto.sh
 ```
 
 # Usage
