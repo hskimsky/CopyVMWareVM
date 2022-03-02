@@ -1,8 +1,7 @@
 package com.tistory.hskimsky.copyvmware;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -10,9 +9,8 @@ import java.io.File;
  * @author Haneul Kim
  * @version 0.1
  */
+@Slf4j
 public class CheckThread implements Runnable {
-
-  private static final Logger logger = LoggerFactory.getLogger(CheckThread.class);
 
   private final long sourceSize;
   private final File target;
@@ -36,7 +34,7 @@ public class CheckThread implements Runnable {
       }
       targetSize = FileUtils.sizeOfDirectory(this.target);
       double progress = ((double) targetSize / (double) this.sourceSize) * 100;
-      logger.info("{} {} / {} = {}",
+      log.info("{} {} / {} = {}",
         this.targetVMName, String.format("%,d", targetSize), String.format("%,d", this.sourceSize), String.format("%.2f%%", progress));
     }
     successFile.delete();

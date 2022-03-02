@@ -3,10 +3,9 @@ package com.tistory.hskimsky.copyvmware;
 import com.beust.jcommander.JCommander;
 import com.tistory.hskimsky.jcommander.CloneSpec;
 import com.tistory.hskimsky.jcommander.CloneSpecArgs;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,9 +21,9 @@ import java.util.concurrent.TimeUnit;
  * @author Haneul Kim
  * @version 0.1
  */
+@Slf4j
 public class Main {
 
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
   public static final String VM_CONF_DIR = "E:\\vm\\conf";
   public static final String ENCODING = "UTF-8";
 
@@ -67,9 +66,9 @@ public class Main {
       File vmConfDir = new File(VM_CONF_DIR, cloneSpec.getDisplayName());
       if (targetDir.exists() && this.force) {
         FileUtils.deleteDirectory(targetDir);
-        logger.warn("{} is deleted!!", targetDir);
+        log.warn("{} is deleted!!", targetDir);
         FileUtils.deleteDirectory(vmConfDir);
-        logger.warn("{} is deleted!!", vmConfDir);
+        log.warn("{} is deleted!!", vmConfDir);
       }
       targetDir.mkdirs();
       vmConfDir.mkdirs();
@@ -90,8 +89,8 @@ public class Main {
     this.executor.shutdown();
     this.executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    logger.info("All VMs copy end.");
+    log.info("All VMs copy end.");
     long endTime = System.nanoTime();
-    logger.info("All VMs copy elapsed = {} (ms)", (endTime - startTime) / 1000000);
+    log.info("All VMs copy elapsed = {} (ms)", (endTime - startTime) / 1000000);
   }
 }

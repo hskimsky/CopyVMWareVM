@@ -2,11 +2,10 @@ package com.tistory.hskimsky.copyvmware;
 
 import com.tistory.hskimsky.jcommander.CloneSpec;
 import com.tistory.hskimsky.util.NativeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,9 +18,8 @@ import java.util.Objects;
  * @author Haneul Kim
  * @version 0.1
  */
+@Slf4j
 public class CopyNMoveThread implements Runnable {
-
-  private static final Logger logger = LoggerFactory.getLogger(CopyNMoveThread.class);
 
   private final CloneSpec cloneSpec;
   private final File sourceDir;
@@ -47,14 +45,14 @@ public class CopyNMoveThread implements Runnable {
 
   private void copyVM() throws IOException {
     String displayName = this.targetDir.getName();
-    logger.info("{} copy start!!", displayName);
+    log.info("{} copy start!!", displayName);
     long startTime = System.nanoTime();
     // except log files
     FileUtils.copyDirectory(this.sourceDir, this.targetDir, pathname -> !pathname.getName().endsWith(".log"));
     long endTime = System.nanoTime();
     long elapsedMillis = (endTime - startTime) / 1000000;
-    logger.info("{} copy elapsed = {} (ms)", displayName, elapsedMillis);
-    logger.info("{} copy end!!!!", displayName);
+    log.info("{} copy elapsed = {} (ms)", displayName, elapsedMillis);
+    log.info("{} copy end!!!!", displayName);
 
     createSuccessFile();
   }
